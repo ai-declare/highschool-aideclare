@@ -1,8 +1,9 @@
 package com.aideclare.entities
 
+import com.aideclare.entities.dsl.adt.Endpoint
 import com.aideclare.entities.dsl.syntax.*
 
-class HighschoolApp[System, Api[_]](using systemDsl: SystemDsl[System, Api], apiDsl: ApiDsl[Api]) :
+class HighschoolApp[System, Api[_]](using systemDsl: SystemDsl[System, Api], apiDsl: ApiDsl[Api]):
 
   import apiDsl.*
   import com.aideclare.entities.dsl.syntax.*
@@ -11,27 +12,44 @@ class HighschoolApp[System, Api[_]](using systemDsl: SystemDsl[System, Api], api
   def highschoolSystem: System =
     // Rest system name declaration
     system("highschool")
-      // Declares a secured API to manage students, only Admin users will be able to operate it.
-      // The path for this API will be /api/student
+      // /api/studentgroup public API. endpoints: GET /api/studentgroup, GET /api/studentgroup/{id}
+      .public[StudentGroup](api(Endpoint.ReadResourceEndpoints))
+      // /api/professor public API. endpoints: GET /api/professor, GET /api/professor/{id}
+      .public[Professor](
+        api[Professor](Endpoint.ReadResourceEndpoints)
+          // /api/professor/{professorId}/studentgroup public API. endpoints: GET /api/professor/{professorId}/studentgroup,
+          // GET /api/professor/{professorId}/studentgroup/{groupId}
+          ./[StudentGroup](
+            // /api/professor/{professorId}/studentgroup/{groupId}/student public API.
+            // endpoints: GET /api/professor/{professorId}/studentgroup/{groupId}/student,
+            // GET /api/professor/{professorId}/studentgroup/{groupId}/{groupId}/student/{studentId}
+            api[StudentGroup](Endpoint.ReadResourceEndpoints)./[Student](api(Endpoint.ReadResourceEndpoints))
+          )
+      )
+      // /api/student public API. endpoints: GET /api/student, GET /api/student/{id}
+      .public[Student](api(Endpoint.ReadResourceEndpoints))
+      // The following 4 APIs will allow Admin users to manage Professor, Student, StudentGroup and Admin entities
+      // /api/professor public API. endpoints: GET /api/professor, GET /api/professor/{id}, POST /api/professor,
+      // PUT /api/professor/{id}, DELETE PUT /api/professor/{id}
+      .authenticated[Professor, Admin]
+      // /api/student public API. endpoints: GET /api/student, GET /api/student/{id}, POST /api/student,
+      // PUT /api/student/{id}, DELETE PUT /api/student/{id}
       .authenticated[Student, Admin]
-      // Declares a secured API to manage student groups, only Admin users will be able to operate it.
-      // The path for this API will be /api/studentgroup
-      .authenticated[StudentGroup, Admin](
-        // Declares a secured API to manage students that belong to a certain student group.
-        // since it is a subAPI of /student only admin users will be able to operate it.
-        // The path for this API will be /api/studentgroup/{groupId}/student
-        api[StudentGroup]
-          ./[Student]
+      // /api/studentgroup public API. endpoints: GET /api/studentgroup, GET /api/studentgroup/{id}, POST /api/studentgroup,
+      // PUT /api/studentgroup/{id}, DELETE PUT /api/studentgroup/{id}
+      .authenticated[StudentGroup, Admin]
+      // /api/admin public API. endpoints: GET /api/admin, GET /api/admin/{id}, POST /api/admin,
+      // PUT /api/admin/{id}, DELETE PUT /api/admin/{id}
+      .authenticated[Admin, Admin]
+      // Declares an API that belongs to Professor users and allow to see modify their data
+      // /api/me/professor, endpoints GET and PUT
+      .me[Professor](
+        api[Professor]
+          // Endpoints to manage authenticated professor student groups
+          // /api/me/professor/studentgroup, all endpoints are available (create, update, delete, list)
+          ./[StudentGroup](
+            // Endpoints to manage students that belong to an authenticated professor student group
+            // /api/me/professor/studentgroup/{groupId}/student, all endpoints are available (create, update, delete, list)
+            api[StudentGroup]./[Student]
+          )
       )
-      // Declares a public API to manage professors, anyone will be able to operate it.
-      // The path for this API will be /api/professor
-      .public[Professor]
-
-
-  private def professorAdminApis =
-    api[Professor]
-      ./(
-        api[StudentGroup]
-          ./[Student]
-      )
-
