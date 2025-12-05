@@ -27,9 +27,7 @@ class AirlineApp[System, Api[_]](using systemDsl: SystemDsl[System, Api], apiDsl
       )
       .me[Customer](
         api[Customer]()./[Passenger](
-            api[Passenger]().->[Flight](
-                api[Flight]()./[Passenger](api[Passenger]())
-            )
+            api[Passenger]().->[Flight]
         )
       )
       .authenticated[Customer, CompanyAdmin]

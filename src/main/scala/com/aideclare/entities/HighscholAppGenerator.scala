@@ -9,3 +9,4 @@ object HighscholAppGenerator extends App :
   sender.send(
     new HighschoolApp[RestSystem, ApiDsl.Resources].highschoolSystem
   )
+  
