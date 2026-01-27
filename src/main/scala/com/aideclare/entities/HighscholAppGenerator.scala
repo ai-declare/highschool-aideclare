@@ -9,3 +9,4 @@ object HighscholAppGenerator extends App :
   sender.send(
     HighschoolApp.highschoolSystem
   )
+  
