@@ -5,7 +5,7 @@ ThisBuild / scalaVersion := "3.3.6"
 
 libraryDependencies ++= Seq(
   // AI Declare SDK
-  "com.ai-declare" %% "sdk" % "0.1.1-BETA"
+  "com.ai-declare" %% "sdk" % "1.1.2-BETA"
 
 )
 

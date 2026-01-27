@@ -7,5 +7,5 @@ object HighscholAppGenerator extends App :
 
   val sender = ExecutionSender()
   sender.send(
-    new HighschoolApp[RestSystem, ApiDsl.Resources].highschoolSystem
+    HighschoolApp.highschoolSystem
   )
