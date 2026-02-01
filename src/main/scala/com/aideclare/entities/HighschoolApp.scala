@@ -12,13 +12,22 @@ object HighschoolApp:
       // The following 4 APIs will allow Admin users to manage Professor, Student, StudentGroup and Admin entities
       // /api/professor public API. endpoints: GET /api/professor, GET /api/professor/{id}, POST /api/professor,
       // PUT /api/professor/{id}, DELETE PUT /api/professor/{id}
-      .addAuthenticatedApi[Professor, Admin]()
+      .addAuthenticatedApi[Professor, Admin](
+        api[Professor]
+          ./[StudentGroup](
+            api[StudentGroup]
+              ./[Student]
+          )
+      )
       // /api/student public API. endpoints: GET /api/student, GET /api/student/{id}, POST /api/student,
       // PUT /api/student/{id}, DELETE PUT /api/student/{id}
       .addAuthenticatedApi[Student, Admin]()
       // /api/studentgroup public API. endpoints: GET /api/studentgroup, GET /api/studentgroup/{id}, POST /api/studentgroup,
       // PUT /api/studentgroup/{id}, DELETE PUT /api/studentgroup/{id}
-      .addAuthenticatedApi[StudentGroup, Admin]()
+      .addAuthenticatedApi[StudentGroup, Admin](
+        api[StudentGroup]
+          ./[Student]
+      )
       // /api/admin public API. endpoints: GET /api/admin, GET /api/admin/{id}, POST /api/admin,
       // PUT /api/admin/{id}, DELETE PUT /api/admin/{id}
       .addAuthenticatedApi[Admin, Admin]()
