@@ -12,24 +12,20 @@ class AirlineApp[System, Api[_]](using systemDsl: SystemDsl[System, Api], apiDsl
   def airlineSystem: System =
     // Rest system name declaration
     system("airline")
-      .public[Company](
-        api[Company](Endpoint.ReadResourceEndpoints)./[Flight](
-            api(Endpoint.ReadResourceEndpoints)
-        )
-      )
-      .public[Flight](api[Flight](Endpoint.ReadResourceEndpoints))
       .me[CompanyAdmin](
         api[CompanyAdmin]().->[Company](
-            api[Company]()./[Flight](
-                api[Flight]()./[Passenger](api[Passenger]())
-            )
+          api[Company]()./[Flight](
+            api[Flight]()./[Passenger](api[Passenger]())
+          )
         )
       )
       .me[Customer](
         api[Customer]()./[Passenger](
-            api[Passenger]().->[Flight]
+          api[Passenger]
         )
       )
-      .authenticated[Customer, CompanyAdmin]
-      
+      .authenticated[Customer, Admin]
+      .authenticated[CompanyAdmin, Admin]
+      .authenticated[Admin, Admin]
+
     
