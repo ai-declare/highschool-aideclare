@@ -4,8 +4,6 @@ import com.aideclare.entities.dsl.gadt.{System, api, singleResourceApi}
 
 object HighscholAppGenerator extends App:
 
-  val sender = ExecutionSender()
-
   val highschoolSystem: System =
     // Rest system name declaration
     System("highschool")
@@ -44,6 +42,7 @@ object HighscholAppGenerator extends App:
           )
       )
       .addMeApi[Student]()
-  
+
+  val sender = ExecutionSender()
   sender.send(highschoolSystem)
   
